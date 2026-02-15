@@ -29,38 +29,37 @@ L’idée est de créer une plateforme complète où le frontend communique avec
 
 ---
 
-## Installation et déploiement
-
-1. Cloner le projet :
+### 1️⃣ Cloner le projet
 ```bash
 git clone https://github.com/naelkml/ansible.git
 cd projet-ansible-final
-Vérifier la présence du mot de passe dans .vault_pass.
-Lancer le déploiement complet avec Docker Compose :
+2️⃣ Vérifier la configuration
+Assurez-vous que le mot de passe est présent dans le fichier .vault_pass.
+3️⃣ Lancer le déploiement complet
 docker-compose up -d
-Les services seront accessibles :
+4️⃣ Accéder aux services
 Frontend web : http://localhost:8081 / http://localhost:8082
 API backend : http://localhost:3001/ et http://localhost:3001/users
-Points fonctionnels
+✅ Points fonctionnels
 Les conteneurs se lancent correctement via Docker Compose.
 L’API Node.js fonctionne localement et peut se connecter à PostgreSQL depuis le conteneur app.
 PostgreSQL est initialisé avec l’utilisateur appuser et la base appdb.
 Le frontend Nginx sert correctement la page HTML statique.
-Limitations / problèmes rencontrés
-Malgré un investissement à 200 %, plusieurs points n’ont pas fonctionné comme prévu :
+⚠️ Limitations / problèmes rencontrés
+Malgré un investissement à 200 %, plusieurs points n’ont pas fonctionné comme prévu :
 Communication frontend → backend via Nginx
 Les requêtes http://web1/api/users échouaient souvent avec “connection refused” ou “no pg_hba.conf entry”.
-Problème lié aux adresses Docker internes et aux ports exposés, notamment avec la configuration du proxy dans Nginx.
+Problème lié aux adresses Docker internes et aux ports exposés, notamment avec la configuration du reverse-proxy.
 Exécution de l’API depuis le conteneur db1
-Lancement initial impossible car node app.js était sur l’hôte local, et non dans le conteneur.
+Lancement initial impossible car node app.js était sur l’hôte local et non dans le conteneur.
 Solution : créer un conteneur app dédié pour Node.js et monter correctement le code.
 Erreurs de mot de passe PostgreSQL / SCRAM
 La variable d’environnement PGPASSWORD n’était pas toujours reconnue par Node.js, générant client password must be a string.
-Solution : créer un conteneur dédié pour Node.js et définir correctement toutes les variables d’environnement.
+Solution : conteneur dédié pour Node.js avec variables d’environnement correctement définies.
 Problèmes de port occupé
-Le port 3000 était déjà utilisé localement → changement pour 3001.
-Remarques finales
-Ce projet est fonctionnel en local avec Docker Compose.
-Le frontend et l’API communiquent correctement lorsque tous les conteneurs sont en route.
+Le port 3000 était déjà utilisé localement → changement vers 3001.
+📝 Remarques finales
+Projet fonctionnel en local via Docker Compose.
+Frontend et API communiquent correctement lorsque tous les conteneurs sont en route.
 Les points de limitation listés sont des pistes d’amélioration pour rendre le projet totalement stable et accessible depuis Nginx en proxy inverse.
-Malgré ces difficultés, je me suis donné à 200 % pour que l’infrastructure fonctionne de bout en bout, en résolvant les problèmes de PostgreSQL, Node.js et Docker autant que possible. L’API a été la partie la plus complexe et chronophage du projet.
+Malgré les difficultés, investissement à 200 % pour que l’infrastructure fonctionne de bout en bout, en résolvant les problèmes PostgreSQL, Node.js et Docker. L’API a été la partie la plus complexe et chronophage.
