@@ -1,0 +1,16 @@
+- name: Install Nginx
+  apt:
+    name: nginx
+    state: present
+    update_cache: yes
+
+- name: Deploy Nginx configuration
+  template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/sites-available/default
+  notify: Restart Nginx
+
+- name: Create homepage
+  copy:
+    content: "<h1>Bienvenue sur mon site</h1>"
+    dest: /var/www/html/index.html

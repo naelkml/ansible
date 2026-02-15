@@ -1,0 +1,14 @@
+- name: Update apt cache
+  apt:
+    update_cache: yes
+  when: "'db1' not in inventory_hostname"
+
+- name: Install essential packages
+  apt:
+    name:
+      - curl
+      - vim
+      - htop
+      - git
+    state: present
+  when: "'db1' not in inventory_hostname"

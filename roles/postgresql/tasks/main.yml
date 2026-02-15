@@ -1,0 +1,79 @@
+- name: Initialiser PostgreSQL cluster si nécessaire
+  become: yes
+  become_user: postgres
+  shell: |
+    if [ ! -d "/var/lib/postgresql/14/main/base" ]; then
+      /usr/lib/postgresql/14/bin/initdb -D /var/lib/postgresql/14/main
+    fi
+  args:
+    executable: /bin/bash
+  check_mode: no
+  changed_when: false
+
+- name: Vérifier si le cluster PostgreSQL existe
+  stat:
+    path: /var/lib/postgresql/14/main/PG_VERSION
+  register: pg_cluster
+
+- name: Initialiser le cluster PostgreSQL si absent
+  become_user: postgres
+  shell: |
+    /usr/lib/postgresql/14/bin/initdb -D /var/lib/postgresql/14/main --auth-local=trust --auth-host=trust
+  when: not pg_cluster.stat.exists
+
+
+# - name: Démarrer PostgreSQL (Docker mode)
+#   become: yes
+#   become_user: postgres
+#   shell: |
+#     /usr/lib/postgresql/14/bin/pg_ctl -D /var/lib/postgresql/14/main -l /var/lib/postgresql/logfile start
+#   args:
+#     executable: /bin/bash
+#   check_mode: no
+#   changed_when: false
+
+
+
+- name: Vérifier que PostgreSQL tourne
+  shell: pgrep -fa postgres
+  register: postgres_process
+  failed_when: postgres_process.rc != 0
+  changed_when: false
+
+- name: Creation PostgreSQL user
+  become: yes
+  become_user: postgres
+  postgresql_user:
+    name: "{{ postgres_user }}"
+    password: "{{ postgres_password }}"
+    state: present
+
+- name: Creation PostgreSQL database
+  become: yes
+  become_user: postgres
+  postgresql_db:
+    name: "{{ postgres_db }}"
+    owner: "{{ postgres_user }}"
+    state: present
+
+- name: Initialiser table users
+  become: yes
+  become_user: postgres
+  postgresql_query:
+    db: "{{ postgres_db }}"
+    query: |
+      CREATE TABLE IF NOT EXISTS users (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(100) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+      INSERT INTO users (name) 
+      SELECT 'Utilisateur Test' 
+      WHERE NOT EXISTS (SELECT 1 FROM users LIMIT 1);
+
+- name: Gestion privileges sur table users à l'utilisateur
+  become: yes
+  become_user: postgres
+  postgresql_query:
+    db: "{{ postgres_db }}"
+    query: "GRANT ALL PRIVILEGES ON TABLE users TO {{ postgres_user }};"

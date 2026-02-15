@@ -1,0 +1,9 @@
+[webservers]
+web1 ansible_host=127.0.0.1 ansible_port=2221 ansible_user=root ansible_ssh_pass=ansible
+web2 ansible_host=127.0.0.1 ansible_port=2222 ansible_user=root ansible_ssh_pass=ansible
+
+[appservers]
+db1 ansible_host=127.0.0.1 ansible_port=2223 ansible_user=root ansible_ssh_pass=ansible
+
+[all:vars]
+ansible_python_interpreter=/usr/bin/python3

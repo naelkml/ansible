@@ -1,0 +1,21 @@
+- name: Install Node.js
+  apt:
+    name:
+      - nodejs
+      - npm
+    state: present
+    update_cache: yes
+
+- name: Deploy Node.js API
+  copy:
+    src: files/
+    dest: /opt/myapp/
+    mode: '0755'
+
+- name: Install Node.js dependencies
+  npm:
+    path: /opt/myapp
+    state: present
+
+- name: Start Node.js API
+  shell: "nohup node /opt/myapp/app.js &"

@@ -1,0 +1,28 @@
+- hosts: all
+  vars_files:
+    - group_vars/all/vault.yml
+  tasks:
+    - name: Test connection
+      ping:
+
+- name: configuration de base
+  hosts: all
+  become: yes
+  roles:
+    - common
+
+- name: Deploiement backend et database
+  hosts: appservers
+  become: yes
+  vars_files:
+    - ../group_vars/all/vars.yml
+    - ../group_vars/all/vault.yml 
+  roles:
+    - postgresql
+    - nodejs
+
+- name: Deploiement frontend
+  hosts: webservers
+  become: yes
+  roles:
+    - nginx

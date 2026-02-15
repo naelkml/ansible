@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  web1:
+    image: ubuntu:22.04
+    container_name: ansible-web1
+    hostname: web1
+    command: >
+      bash -c "
+      apt-get update &&
+      apt-get install -y openssh-server python3 sudo &&
+      mkdir -p /run/sshd &&
+      echo 'root:ansible' | chpasswd &&
+      sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config &&
+      sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config &&
+      /usr/sbin/sshd -D"
+    ports:
+      - "2221:22"
+      - "8081:80"
+    networks:
+      - ansible-net
+
+  web2:
+    image: ubuntu:22.04
+    container_name: ansible-web2
+    hostname: web2
+    command: >
+      bash -c "
+      apt-get update &&
+      apt-get install -y openssh-server python3 sudo &&
+      mkdir -p /run/sshd &&
+      echo 'root:ansible' | chpasswd &&
+      sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config &&
+      sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config &&
+      /usr/sbin/sshd -D"
+    ports:
+      - "2222:22"
+      - "8082:80"
+    networks:
+      - ansible-net
+
+  db1:
+    image: ubuntu:22.04
+    container_name: ansible-db1
+    hostname: db1
+    command: >
+      bash -c "
+      apt-get update &&
+      apt-get install -y openssh-server python3 sudo postgresql postgresql-contrib python3-psycopg2 &&
+      mkdir -p /run/sshd &&
+      echo 'root:ansible' | chpasswd &&
+      sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config &&
+      sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config &&
+      service postgresql start &&
+      /usr/sbin/sshd -D"
+    ports:
+      - "2223:22"
+      - "5433:5432"
+    networks:
+      - ansible-net
+
+networks:
+  ansible-net:
+    driver: bridge

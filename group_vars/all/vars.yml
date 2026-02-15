@@ -1,0 +1,6 @@
+# Database
+postgres_db: appdb
+postgres_user: appuser
+
+# Backend
+backend_port: 3000
